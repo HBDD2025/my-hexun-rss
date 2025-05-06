@@ -10,8 +10,9 @@ on:
 
 jobs:
   build-and-commit-rss:
-    runs-on: ubuntu-latest # 在最新的 Ubuntu Linux 环境中运行
-
+    runs-on: ubuntu-latest
+    permissions:      # <--- 重要：添加内容写入权限
+      contents: write
     steps:
       - name: Checkout Repository # 第一步：签出你的仓库代码
         uses: actions/checkout@v4
@@ -27,7 +28,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Setup Chrome and ChromeDriver # 第四步：安装 Chrome 和 ChromeDriver
-        uses: browser-actions/setup-chrome@v1 # 使用一个社区的 Action 来简化安装
+        uses: browser-actions/setup-chrome@v1
         # 这个 Action 会安装最新稳定版的 Chrome 和匹配的 ChromeDriver，并把 ChromeDriver 添加到 PATH
 
       - name: Run Python Script to Generate RSS # 第五步：运行你的 Python 脚本
@@ -38,8 +39,4 @@ jobs:
         with:
           commit_message: "Automated RSS feed update"
           file_pattern: hexun_insurance_rss.xml # 只提交这个文件的变动
-          # 可选：如果你想用特定的用户信息提交
-          # commit_user_name: HBDD2025 # 你的 GitHub 用户名
-          # commit_user_email: your-email@example.com # 你的 GitHub 关联邮箱
-          # commit_author: HBDD2025 <your-email@example.com> # 作者信息
-          # push_options: '--force' # 对于单一文件更新通常不需要 --force
+          # 注意：这个 action 默认使用 GITHUB_TOKEN，添加上面的 permissions 后应该能工作
