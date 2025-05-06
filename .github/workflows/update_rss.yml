@@ -1,0 +1,46 @@
+name: Update Hexun Insurance RSS Feed
+
+on:
+  schedule:
+    # 北京时间大约是 UTC 时间 +8 小时
+    # 这个 cron 表达式 '0 2,14 * * *' 表示在 UTC 时间的 2:00 和 14:00 执行
+    # 对应北京时间大约是 上午 10:00 和 晚上 10:00 (或根据夏令时调整)
+    # 你可以根据需要调整频率，例如 '0 */6 * * *' 表示每6小时执行一次
+    - cron: '0 2,14 * * *'
+  workflow_dispatch: # 允许你手动从 GitHub Actions 页面触发此工作流程
+
+jobs:
+  build-and-commit-rss:
+    runs-on: ubuntu-latest # 在最新的 Ubuntu Linux 环境中运行
+
+    steps:
+      - name: Checkout Repository # 第一步：签出你的仓库代码
+        uses: actions/checkout@v4
+
+      - name: Set up Python # 第二步：设置 Python 环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # 我们使用 Python 3.11，你的脚本应该兼容
+
+      - name: Install Python Dependencies # 第三步：安装脚本依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Setup Chrome and ChromeDriver # 第四步：安装 Chrome 和 ChromeDriver
+        uses: browser-actions/setup-chrome@v1 # 使用一个社区的 Action 来简化安装
+        # 这个 Action 会安装最新稳定版的 Chrome 和匹配的 ChromeDriver，并把 ChromeDriver 添加到 PATH
+
+      - name: Run Python Script to Generate RSS # 第五步：运行你的 Python 脚本
+        run: python hexun_multi_rss.py
+
+      - name: Commit and Push Updated RSS File # 第六步：提交并推送更新后的 RSS 文件
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Automated RSS feed update"
+          file_pattern: hexun_insurance_rss.xml # 只提交这个文件的变动
+          # 可选：如果你想用特定的用户信息提交
+          # commit_user_name: YourGitHubUsername
+          # commit_user_email: YourGitHubEmail
+          # commit_author: Author Name <actions@github.com>
+          push_options: '--force' # 如果历史被改动，确保能推送，但对于单一文件更新通常不需要
