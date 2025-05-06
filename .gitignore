@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+selenium_page_content.html
+selenium_page_content_fail.html
+cron.log 
+# 如果还有其他你不想上传的本地临时文件，也可以加进来
