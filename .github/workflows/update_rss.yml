@@ -2,11 +2,10 @@ name: Update Hexun Insurance RSS Feed
 
 on:
   schedule:
-    # 北京时间大约是 UTC 时间 +8 小时
-    # 这个 cron 表达式 '0 2,14 * * *' 表示在 UTC 时间的 2:00 和 14:00 执行
-    # 对应北京时间大约是 上午 10:00 和 晚上 10:00 (或根据夏令时调整)
-    # 你可以根据需要调整频率，例如 '0 */6 * * *' 表示每6小时执行一次
-    - cron: '0 2,14 * * *'
+    # 这个 cron 表达式 '30 */2 * * *' 表示每隔两小时，在第30分钟时执行 (UTC 时间)
+    # 例如: 00:30 UTC, 02:30 UTC, 04:30 UTC, ...
+    # 对应北京时间 (UTC+8) 大约是: 08:30, 10:30, 12:30, ...
+    - cron: '30 */2 * * *'
   workflow_dispatch: # 允许你手动从 GitHub Actions 页面触发此工作流程
 
 jobs:
@@ -20,7 +19,7 @@ jobs:
       - name: Set up Python # 第二步：设置 Python 环境
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11' # 我们使用 Python 3.11，你的脚本应该兼容
+          python-version: '3.11' # 我们使用 Python 3.11
 
       - name: Install Python Dependencies # 第三步：安装脚本依赖
         run: |
@@ -40,7 +39,7 @@ jobs:
           commit_message: "Automated RSS feed update"
           file_pattern: hexun_insurance_rss.xml # 只提交这个文件的变动
           # 可选：如果你想用特定的用户信息提交
-          # commit_user_name: YourGitHubUsername
-          # commit_user_email: YourGitHubEmail
-          # commit_author: Author Name <actions@github.com>
-          push_options: '--force' # 如果历史被改动，确保能推送，但对于单一文件更新通常不需要
+          # commit_user_name: HBDD2025 # 你的 GitHub 用户名
+          # commit_user_email: your-email@example.com # 你的 GitHub 关联邮箱
+          # commit_author: HBDD2025 <your-email@example.com> # 作者信息
+          # push_options: '--force' # 对于单一文件更新通常不需要 --force
