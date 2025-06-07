@@ -3,40 +3,35 @@ name: Update Hexun Insurance RSS Feed
 on:
   schedule:
     # 这个 cron 表达式 '30 */2 * * *' 表示每隔两小时，在第30分钟时执行 (UTC 时间)
-    # 例如: 00:30 UTC, 02:30 UTC, 04:30 UTC, ...
-    # 对应北京时间 (UTC+8) 大约是: 08:30, 10:30, 12:30, ...
     - cron: '30 */2 * * *'
   workflow_dispatch: # 允许你手动从 GitHub Actions 页面触发此工作流程
 
 jobs:
   build-and-commit-rss:
     runs-on: ubuntu-latest
-    permissions:      # <--- 重要：添加内容写入权限
-      contents: write
+    permissions:
+      contents: write # 授予 GITHUB_TOKEN 写权限以便自动提交
     steps:
-      - name: Checkout Repository # 第一步：签出你的仓库代码
+      - name: Checkout Repository # 步骤 1: 检出你的仓库代码
         uses: actions/checkout@v4
 
-      - name: Set up Python # 第二步：设置 Python 环境
+      - name: Set up Python # 步骤 2: 设置 Python 环境
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11' # 我们使用 Python 3.11
+          python-version: '3.11'
 
-      - name: Install Python Dependencies # 第三步：安装脚本依赖
+      - name: Install Python Dependencies # 步骤 3: 安装脚本依赖
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Setup Chrome and ChromeDriver # 第四步：安装 Chrome 和 ChromeDriver
-        uses: browser-actions/setup-chrome@v1
-        # 这个 Action 会安装最新稳定版的 Chrome 和匹配的 ChromeDriver，并把 ChromeDriver 添加到 PATH
+      # 注意：安装 Chrome 和 ChromeDriver 的步骤已被删除，因为新脚本不再需要它们。
 
-      - name: Run Python Script to Generate RSS # 第五步：运行你的 Python 脚本
+      - name: Run Python Script to Generate RSS # 步骤 4: 运行你的 Python 脚本
         run: python hexun_multi_rss.py
 
-      - name: Commit and Push Updated RSS File # 第六步：提交并推送更新后的 RSS 文件
+      - name: Commit and Push Updated RSS File # 步骤 5: 提交并推送更新后的 RSS 文件
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Automated RSS feed update"
           file_pattern: hexun_insurance_rss.xml # 只提交这个文件的变动
-          # 注意：这个 action 默认使用 GITHUB_TOKEN，添加上面的 permissions 后应该能工作
